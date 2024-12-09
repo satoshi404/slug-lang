@@ -82,7 +82,10 @@ static SlugTokenType slug_lexer_get_keywords(char** file_content, unsigned int l
     } else if (strncmp(&file_content[line][*column], "function", 8) == 0) {
         (*column) += 8;
         return SlugTokenFunction;
-    } else if (isalnum(file_content[line][*column])) { 
+    } else if (strncmp(&file_content[line][*column], "//", 2) == 0) {
+        (*column) += 2;
+        return SlugTokenComment;
+    } else if (isalpha(file_content[line][*column]) || file_content[line][*column] == '-') { 
         return SlugTokenIdentifier;
     }
     return SlugTokenUnknown;
@@ -116,6 +119,12 @@ static int slug_lexer_integer(char** file_content, unsigned int line, unsigned i
     return number;
 }
 
+static void slug_lexer_comment(char** file_content, unsigned int line, unsigned int* column) {
+    while (file_content[line][*column] != '\0' && file_content[line][*column] != '\n') {
+        (*column)++;
+    }
+}
+
 static SlugToken* slug_lexer_tokenize(char** file_content, size_t size)  {
     size_t capacity_tokens = 100;
     size_t size_tokens = 0;
@@ -146,22 +155,27 @@ static SlugToken* slug_lexer_tokenize(char** file_content, size_t size)  {
                             .token_identifier = NULL},
                             &size_tokens,
                             &capacity_tokens);
+                    } else if (type == SlugTokenComment) {
+                        slug_lexer_comment(file_content, line, &column);
                     } else {
                         reallocator_tokens(&tokens, (SlugToken){
                             .type = type,
                             .token_number = 0,
                             .token_identifier = NULL},
                             &size_tokens,
-                            &capacity_tokens);
+                            &capacity_tokens); 
                     }
+                    
                 }
-
-                reallocator_tokens(&tokens, (SlugToken) {
-                    .type = SlugTokenUnknown,
-                    .token_number = 0,
-                    .token_identifier = NULL},
-                    &size_tokens,
-                    &capacity_tokens);
+                
+                if (type == SlugTokenUnknown) {
+                     reallocator_tokens(&tokens, (SlugToken) {
+                        .type = type,
+                        .token_number = 0,
+                        .token_identifier = NULL},
+                        &size_tokens,
+                        &capacity_tokens);
+                }
 
                 column++;
             }

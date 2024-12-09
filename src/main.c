@@ -1,13 +1,16 @@
 #include <slug_lexer.h>
+#include <slug_io.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int main() {
-    char* file_content[] = {
-        "let x = 5;"
-    };
-    size_t size = sizeof(file_content) / sizeof(file_content[0]);
-    SlugToken* tokens = slug_lexer_tokens(file_content, size);
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+    FileSource* source = read_file(argv[1]);
+    
+    SlugToken* tokens = slug_lexer_tokens(source->source, source->size);
 
     int i = 0;
     while (tokens[i].type != SlugTokenEof) {
@@ -28,5 +31,7 @@ int main() {
         }
     }
     free(tokens);
+
+    free_file_source(source);
     return 0;
 }

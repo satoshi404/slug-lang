@@ -22,6 +22,7 @@ typedef enum {
     SlugTokenIdentifier,
     SlugTokenFunction,
     SlugTokenUnknown,
+    SlugTokenComment,
     SlugTokenEof
 } SlugTokenType;
 
