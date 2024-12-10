@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 static void print_ast(Ast* ast) {
+    printf("size : %ld\n", ast->size);
     for (int i = 0; i < ast->size; i++) {
         if (ast->statements[i].stmt_kind == StmtVariableDeclaration) {
             printf("Variable declaration: %s\n", ast->statements[i].stmt_name);
@@ -27,14 +28,15 @@ int main(int argc, char **argv) {
     print_ast(ast);
 
   
-    // Liberar memória dos identificadores
+   
+
+    free_file_source(source);
+     // Liberar memória dos identificadores
     for (int j = 0; j < index; j++) {
         if (tokens[j].token_identifier != NULL) {
             free(tokens[j].token_identifier);
         }
     }
     free(tokens);
-
-    free_file_source(source);
     return 0;
 }

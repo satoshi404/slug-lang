@@ -66,11 +66,13 @@ Ast* slug_parser_parse(SlugToken *tokens, unsigned int *index) {
 
     while (tokens[*index].type != SlugTokenEof) {
 
+        printf("kind %s\n", slug_type_to_string(tokens[*index].type));
         if (tokens[*index].type == SlugTokenLet) {
             slug_parser_ast_alloc_stmt(ast, slug_parser_stmt_declaration_variable(tokens , index));
+        } else {
+            printf("Parser error: unknown token type %s\n", slug_type_to_string(slug_parser_peek(tokens, index).type));
+            exit(1);
         }
-
-        slug_parser_advance(index);
     }
     return ast;
 }
