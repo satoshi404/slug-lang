@@ -112,7 +112,7 @@ static char* slug_lexer_identifier(char** file_content, unsigned int line, unsig
 
 static int slug_lexer_integer(char** file_content, unsigned int line, unsigned int* column) {
     int number = 0;
-    while (isdigit(file_content[line][*column]) && file_content[line][*column] != '\0') {
+    while (isdigit(file_content[line][*column])) {
         number = number * 10 + (file_content[line][*column] - '0');
         (*column)++;
     }
@@ -148,6 +148,7 @@ static SlugToken* slug_lexer_tokenize(char** file_content, size_t size)  {
                             .token_identifier = slug_lexer_identifier(file_content, line, &column)},
                             &size_tokens,
                             &capacity_tokens);   
+                        continue;
                     } else if (type == SlugTokenNumber) {
                         reallocator_tokens(&tokens, (SlugToken){
                             .type = type,
@@ -155,8 +156,10 @@ static SlugToken* slug_lexer_tokenize(char** file_content, size_t size)  {
                             .token_identifier = NULL},
                             &size_tokens,
                             &capacity_tokens);
+                        continue;
                     } else if (type == SlugTokenComment) {
                         slug_lexer_comment(file_content, line, &column);
+                        continue;
                     } else {
                         reallocator_tokens(&tokens, (SlugToken){
                             .type = type,
@@ -176,7 +179,6 @@ static SlugToken* slug_lexer_tokenize(char** file_content, size_t size)  {
                         &size_tokens,
                         &capacity_tokens);
                 }
-
                 column++;
             }
             column = 0;
